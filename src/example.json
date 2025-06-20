@@ -1,0 +1,105 @@
+{
+  "message": "Here you go",
+  "result": [
+    {
+      "question": "According to the text, what are the two main features of TypeScript for functions?",
+      "choices": [
+        {
+          "id": 1,
+          "text": "It specifies the type of input values and the type of output values."
+        },
+        {
+          "id": 2,
+          "text": "It only specifies the type of input values."
+        },
+        {
+          "id": 3,
+          "text": "It only specifies the type of output values."
+        },
+        {
+          "id": 4,
+          "text": "It does not specify any types, it only provides documentation."
+        }
+      ],
+      "answer": {
+        "id": 1,
+        "text": "It specifies the type of input values and the type of output values."
+      }
+    },
+    {
+      "question": "What is the purpose of parameter type annotations in TypeScript functions?",
+      "choices": [
+        {
+          "id": 1,
+          "text": "To declare what types of parameters the function accepts."
+        },
+        {
+          "id": 2,
+          "text": "To define the function's name."
+        },
+        {
+          "id": 3,
+          "text": "To specify the function's return value."
+        },
+        {
+          "id": 4,
+          "text": "To make the code more readable for other developers."
+        }
+      ],
+      "answer": {
+        "id": 1,
+        "text": "To declare what types of parameters the function accepts."
+      }
+    },
+    {
+      "question": "According to the text, why would you use return type annotations even though type inference usually makes them unnecessary?",
+      "choices": [
+        {
+          "id": 1,
+          "text": "Because TypeScript requires it for all functions."
+        },
+        {
+          "id": 2,
+          "text": "To allow the function to return multiple data types."
+        },
+        {
+          "id": 3,
+          "text": "For documentation purposes, to prevent accidental changes, or simply for personal preference."
+        },
+        {
+          "id": 4,
+          "text": "To improve the performance of the function."
+        }
+      ],
+      "answer": {
+        "id": 3,
+        "text": "For documentation purposes, to prevent accidental changes, or simply for personal preference."
+      }
+    },
+    {
+      "question": "When TypeScript can determine the type of parameters in anonymous functions, they are assigned automatically through what?",
+      "choices": [
+        {
+          "id": 1,
+          "text": "Contextual Typing"
+        },
+        {
+          "id": 2,
+          "text": "Explicit Typing"
+        },
+        {
+          "id": 3,
+          "text": "Implicit Typing"
+        },
+        {
+          "id": 4,
+          "text": "Inferred Typing"
+        }
+      ],
+      "answer": {
+        "id": 1,
+        "text": "Contextual Typing"
+      }
+    }
+  ]
+}
