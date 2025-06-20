@@ -11,7 +11,7 @@ function App() {
     const fetchGeneratedQuiz = async () => {
       if (!mdFilePath) return;
       try {
-        const res = await fetch(`http://localhost:8080/questions`, {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/questions`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
