@@ -30,7 +30,7 @@ const Blank = ({
 
 	return (
 		<label
-			className={`opacity-100 inline-block relative after:absolute after:right-3 ${
+			className={`inline-block relative after:absolute after:right-3 ${
 				check && val === text ? " after:content-['✅'] " : ""
 			} ${check && val && val !== text ? "after:content-['🚫']" : ""}`}
 		>
@@ -46,9 +46,10 @@ const Blank = ({
 				onChange={handleChange}
 				style={{
 					minWidth: inCode ? `${text.length + 10.5}ch` : `${text.length + 4}ch`,
-					// width: inCode ? `${text.length + 10}ch` : "unset",
+					backgroundColor: inCode ? "#1D1D1D" : undefined,
+					borderColor: inCode ? "#1D1D1D" : undefined,
 				}}
-				className={`!opacity-100 border-2 input field-sizing-content pr-10 mx-1 bg-base-300/20 w-[unset] max-w-fit text-lg ${val && check ? "valid:border-2 valid:border-green-700 invalid:border-2 invalid:border-red-700" : ""} ${inCode ? "bg-black m-0 p-0 leading-0 h-[22px] -translate-x-2 pl-1" : ""}`}
+				className={`border-2 input field-sizing-content pr-10 bg-base-300/20 w-[unset] max-w-fit text-lg ${val && check ? "valid:border-2 valid:border-green-700 invalid:border-2 invalid:border-red-700" : ""} ${inCode ? " m-0 p-0 leading-0 h-[20px] -translate-x-1 pl-1 outline-2 outline-offset-1 outline-base-300" : ""}`}
 			/>
 		</label>
 	);

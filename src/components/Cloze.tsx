@@ -11,7 +11,7 @@ import sql from "refractor/lang/sql.js";
 import "./code.css";
 
 import {
-	extractAndSegmentContent,
+	segmentByPattern,
 	keywordPattern,
 	codeBlockPattern,
 } from "../utils/index";
@@ -52,7 +52,7 @@ const Cloze = ({
 	);
 	const textParts = useMemo(
 		() =>
-			extractAndSegmentContent(data.textWithBlanks, codeBlockPattern).flatMap(
+			segmentByPattern(data.textWithBlanks, codeBlockPattern).flatMap(
 				(part) => {
 					// Get keywords from Code blocks and leave intact
 					if (part.startsWith("```")) {
@@ -113,13 +113,12 @@ const Cloze = ({
 		() => ({
 			code(snippet: string, lang = "bash") {
 				if (!allowedLangs.includes(lang)) lang = "bash";
-				const overlaySnippet = extractAndSegmentContent(
-					snippet,
-					keywordPattern,
-				);
+				const overlaySnippet = segmentByPattern(snippet, keywordPattern);
 
+				// Blank components cannot be inserted in highlighted markdown
+				// instead they are in an overlay
 				return (
-					<div key={snippet} className="relative *:!m-0 my-2">
+					<div key={snippet} className="relative *:!m-0 my-2 ">
 						<Refractor language={lang} value={snippet} />
 						<pre
 							className={

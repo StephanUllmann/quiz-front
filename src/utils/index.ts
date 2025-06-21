@@ -1,4 +1,4 @@
-function extractAndSegmentContent(text: string, pattern: RegExp): string[] {
+function segmentByPattern(text: string, pattern: RegExp): string[] {
 	const segments = [];
 	let lastIndex = 0;
 	const matches = [...text.matchAll(pattern)];
@@ -28,4 +28,4 @@ function extractAndSegmentContent(text: string, pattern: RegExp): string[] {
 const keywordPattern = /%%keyword:([^%]+)%%/g;
 const codeBlockPattern = /```(.*?)?\n(.*?)?\n```/gs;
 
-export { extractAndSegmentContent, keywordPattern, codeBlockPattern };
+export { segmentByPattern, keywordPattern, codeBlockPattern };
