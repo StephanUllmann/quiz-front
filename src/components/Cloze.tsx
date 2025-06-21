@@ -1,68 +1,38 @@
-import { useRef, useState, useMemo } from "react";
+import { useRef, useState, useMemo, useCallback } from "react";
 
 import Markdown from "marked-react";
 import { Refractor, registerLanguage } from "react-refractor";
-// Load any languages you want to use from `refractor`
 import bash from "refractor/lang/bash";
 import js from "refractor/lang/javascript.js";
 import ts from "refractor/lang/typescript.js";
-import php from "refractor/lang/php.js";
 import python from "refractor/lang/python.js";
+import csharp from "refractor/lang/csharp.js";
+import sql from "refractor/lang/sql.js";
 import "./code.css";
 
-// Then register them
+import {
+	extractAndSegmentContent,
+	keywordPattern,
+	codeBlockPattern,
+} from "../utils/index";
+
 registerLanguage(bash);
 registerLanguage(js);
 registerLanguage(ts);
-registerLanguage(php);
 registerLanguage(python);
-
-const renderer = {
-	code(snippet: string, lang: string | undefined) {
-		if (!lang) lang = "bash";
-		const allowedLangs = [
-			"js",
-			"ts",
-			"php",
-			"python",
-			"typescript",
-			"javascript",
-		];
-		if (!allowedLangs.includes(lang)) lang = "bash";
-		return <Refractor key={snippet} language={lang} value={snippet} />;
-	},
-};
+registerLanguage(csharp);
+registerLanguage(sql);
+const allowedLangs = [
+	"js",
+	"ts",
+	"python",
+	"typescript",
+	"javascript",
+	"csharp",
+	"sql",
+];
 
 import Blank from "./Blank";
-
-function extractAndSegmentContent(text: string): string[] {
-	const codeBlockPattern = /```(.*?)?\n(.*?)?\n```/gs;
-	const segments = [];
-	let lastIndex = 0;
-	const matches = [...text.matchAll(codeBlockPattern)];
-
-	for (const match of matches) {
-		const startIndex = match.index;
-		const endIndex = match.index + match[0].length;
-
-		// 1. Extract the text before the current code block
-		if (startIndex > lastIndex) {
-			segments.push(text.substring(lastIndex, startIndex));
-		}
-
-		// 2. Extract the code block itself
-		segments.push(match[0]); // match[0] is the entire matched code block with backticks
-
-		lastIndex = endIndex;
-	}
-
-	// 3. Extract any remaining text after the last code block
-	if (lastIndex < text.length) {
-		segments.push(text.substring(lastIndex));
-	}
-
-	return segments.filter((segment) => segment !== "");
-}
 
 const Cloze = ({
 	data,
@@ -82,21 +52,39 @@ const Cloze = ({
 	);
 	const textParts = useMemo(
 		() =>
-			extractAndSegmentContent(data.textWithBlanks).flatMap((part) =>
-				part.split("%%").map((part) => {
-					if (part.startsWith("keyword:")) {
-						const word = part.slice(8);
-						setBlanks((b) => {
-							if (b.some((bl) => bl.content === word)) return b;
-							return [...b, { content: word, flag: "unset" } as Blank].toSorted(
-								() => Math.random() - 0.5,
-							);
-						});
-						return word;
+			extractAndSegmentContent(data.textWithBlanks, codeBlockPattern).flatMap(
+				(part) => {
+					// Get keywords from Code blocks and leave intact
+					if (part.startsWith("```")) {
+						const keywordMatches = [...part.matchAll(keywordPattern)];
+						for (const [, match] of keywordMatches) {
+							setBlanks((b) => {
+								if (b.some((bl) => bl.content === match)) return b;
+								return [
+									...b,
+									{ content: match, flag: "unset" } as Blank,
+								].toSorted(() => Math.random() - 0.5);
+							});
+						}
+						return part;
 					}
+					// Get keywords from plain text
+					return part.split("%%").map((part) => {
+						if (part.startsWith("keyword:")) {
+							const word = part.slice(8);
+							setBlanks((b) => {
+								if (b.some((bl) => bl.content === word)) return b;
+								return [
+									...b,
+									{ content: word, flag: "unset" } as Blank,
+								].toSorted(() => Math.random() - 0.5);
+							});
+							return word;
+						}
 
-					return part;
-				}),
+						return part;
+					});
+				},
 			),
 		[data.textWithBlanks],
 	);
@@ -115,14 +103,60 @@ const Cloze = ({
 		}
 	};
 
-	const checkExercise = () => {
+	const checkExercise = useCallback(() => {
 		const isValid = containerRef.current?.checkValidity() ?? false;
 		setIsCorrect(isValid);
 		setCheck(isValid);
-	};
+	}, [setCheck]);
+
+	const renderer = useMemo(
+		() => ({
+			code(snippet: string, lang = "bash") {
+				if (!allowedLangs.includes(lang)) lang = "bash";
+				const overlaySnippet = extractAndSegmentContent(
+					snippet,
+					keywordPattern,
+				);
+
+				return (
+					<div key={snippet} className="relative *:!m-0 my-2">
+						<Refractor language={lang} value={snippet} />
+						<pre
+							className={
+								"inset-0 absolute opacity-100 refractor language-typescript "
+							}
+						>
+							<code className="language-typescript">
+								{overlaySnippet.map((s) => {
+									if (s.startsWith("%%keyword:")) {
+										return (
+											<Blank
+												key={s}
+												text={s.slice(10, -2)}
+												blanks={blanks}
+												check={check}
+												checkExercise={checkExercise}
+												inCode={true}
+											/>
+										);
+									}
+									return (
+										<span key={s} className="opacity-0">
+											{s}
+										</span>
+									);
+								})}
+							</code>
+						</pre>
+					</div>
+				);
+			},
+		}),
+		[blanks, check, checkExercise],
+	);
 
 	return (
-		<div className="max-w-2xl mx-auto p-6 rounded-lg shadow-lg space-y-5">
+		<div className="max-w-3xl mx-auto p-6 rounded-lg shadow-lg space-y-5">
 			<h2 className="text-2xl font-bold ">Fill in the blanks</h2>
 
 			<form ref={containerRef} className="text-lg leading-loose ">
