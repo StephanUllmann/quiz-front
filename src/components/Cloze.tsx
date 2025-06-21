@@ -1,5 +1,68 @@
 import { useRef, useState, useMemo } from "react";
+
+import Markdown from "marked-react";
+import { Refractor, registerLanguage } from "react-refractor";
+// Load any languages you want to use from `refractor`
+import bash from "refractor/lang/bash";
+import js from "refractor/lang/javascript.js";
+import ts from "refractor/lang/typescript.js";
+import php from "refractor/lang/php.js";
+import python from "refractor/lang/python.js";
+import "./code.css";
+
+// Then register them
+registerLanguage(bash);
+registerLanguage(js);
+registerLanguage(ts);
+registerLanguage(php);
+registerLanguage(python);
+
+const renderer = {
+	code(snippet: string, lang: string | undefined) {
+		if (!lang) lang = "bash";
+		const allowedLangs = [
+			"js",
+			"ts",
+			"php",
+			"python",
+			"typescript",
+			"javascript",
+		];
+		if (!allowedLangs.includes(lang)) lang = "bash";
+		return <Refractor key={snippet} language={lang} value={snippet} />;
+	},
+};
+
 import Blank from "./Blank";
+
+function extractAndSegmentContent(text: string): string[] {
+	const codeBlockPattern = /```(.*?)?\n(.*?)?\n```/gs;
+	const segments = [];
+	let lastIndex = 0;
+	const matches = [...text.matchAll(codeBlockPattern)];
+
+	for (const match of matches) {
+		const startIndex = match.index;
+		const endIndex = match.index + match[0].length;
+
+		// 1. Extract the text before the current code block
+		if (startIndex > lastIndex) {
+			segments.push(text.substring(lastIndex, startIndex));
+		}
+
+		// 2. Extract the code block itself
+		segments.push(match[0]); // match[0] is the entire matched code block with backticks
+
+		lastIndex = endIndex;
+	}
+
+	// 3. Extract any remaining text after the last code block
+	if (lastIndex < text.length) {
+		segments.push(text.substring(lastIndex));
+	}
+
+	return segments.filter((segment) => segment !== "");
+}
 
 const Cloze = ({
 	data,
@@ -19,42 +82,50 @@ const Cloze = ({
 	);
 	const textParts = useMemo(
 		() =>
-			data.textWithBlanks.split("%%").map((part) => {
-				if (part.startsWith("keyword:")) {
-					const word = part.slice(8);
-					setBlanks((b) => {
-						if (b.some((bl) => bl.content === word)) return b;
-						return [...b, { content: word, flag: "unset" } as Blank].toSorted(
-							() => Math.random() - 0.5,
-						);
-					});
-					return word;
-				}
-				return part;
-			}),
+			extractAndSegmentContent(data.textWithBlanks).flatMap((part) =>
+				part.split("%%").map((part) => {
+					if (part.startsWith("keyword:")) {
+						const word = part.slice(8);
+						setBlanks((b) => {
+							if (b.some((bl) => bl.content === word)) return b;
+							return [...b, { content: word, flag: "unset" } as Blank].toSorted(
+								() => Math.random() - 0.5,
+							);
+						});
+						return word;
+					}
+
+					return part;
+				}),
+			),
 		[data.textWithBlanks],
 	);
 
 	const handleClipboardClick = async (text: string) => {
-		if (clipboardContent === text) {
-			await navigator.clipboard.writeText("");
-			setClipboardContent("");
-		} else {
-			await navigator.clipboard.writeText(text);
-			setClipboardContent(text);
+		try {
+			if (clipboardContent === text) {
+				await navigator.clipboard.writeText("");
+				setClipboardContent("");
+			} else {
+				await navigator.clipboard.writeText(text);
+				setClipboardContent(text);
+			}
+		} catch {
+			console.log("Clipboard access restricted");
 		}
 	};
 
 	const checkExercise = () => {
-		setIsCorrect(containerRef.current?.checkValidity() ?? false);
-		setCheck(containerRef.current?.checkValidity() ?? false);
+		const isValid = containerRef.current?.checkValidity() ?? false;
+		setIsCorrect(isValid);
+		setCheck(isValid);
 	};
 
 	return (
 		<div className="max-w-2xl mx-auto p-6 rounded-lg shadow-lg space-y-5">
 			<h2 className="text-2xl font-bold ">Fill in the blanks</h2>
 
-			<form ref={containerRef} className="text-lg leading-loose">
+			<form ref={containerRef} className="text-lg leading-loose ">
 				{textParts.map((part, ind) => {
 					if (blanks.some((b) => b.content === part)) {
 						return (
@@ -67,7 +138,16 @@ const Cloze = ({
 							/>
 						);
 					}
-					return part;
+					return (
+						<Markdown
+							key={part + ind}
+							gfm
+							renderer={renderer}
+							isInline={!part.startsWith("```")}
+						>
+							{part}
+						</Markdown>
+					);
 				})}
 			</form>
 			{isCorrect ? (

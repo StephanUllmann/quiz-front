@@ -33,16 +33,17 @@ const Blank = ({
 			} ${check && val && val !== text ? "after:content-['🚫']" : ""}`}
 		>
 			<input
+				required
 				type="text"
 				name="blank"
 				value={val}
 				pattern={text}
 				spellCheck={false}
-				required
 				onClick={handleClick}
-				onChange={handleChange}
 				onBlur={checkExercise}
-				className={` border-2 input  mx-1 bg-base-300/20 w-[unset] min-w-[0px] max-w-fit text-lg ${val && check ? "valid:border-2 valid:border-green-700 invalid:border-2 invalid:border-red-700" : ""}`}
+				onChange={handleChange}
+				style={{ minWidth: `${text.length + 4}ch` }}
+				className={`border-2 input field-sizing-content pr-10 mx-1 bg-base-300/20 w-[unset] max-w-fit text-lg ${val && check ? "valid:border-2 valid:border-green-700 invalid:border-2 invalid:border-red-700" : ""}`}
 			/>
 		</label>
 	);
