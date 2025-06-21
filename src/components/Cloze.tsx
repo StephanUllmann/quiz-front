@@ -118,7 +118,10 @@ const Cloze = ({
 				// Blank components cannot be inserted in highlighted markdown
 				// instead they are in an overlay
 				return (
-					<div key={snippet} className="relative *:!m-0 my-2 ">
+					<div
+						key={snippet}
+						className="relative *:!m-0 my-2 rounded-2xl shadow overflow-clip"
+					>
 						<Refractor language={lang} value={snippet} />
 						<pre
 							className={
