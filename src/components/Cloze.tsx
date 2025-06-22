@@ -199,7 +199,7 @@ const Cloze = ({
 								<button
 									type="button"
 									key={b.content + ind}
-									className="px-3 py-1 badge badge-info rounded-full cursor-pointer select-none hover:bg-blue-200 transition-colors group relative"
+									className="px-3 py-1 badge bg-[#6054e8] rounded-full cursor-pointer select-none hover:ring transition-colors group relative"
 									onClick={() => handleClipboardClick(b.content)}
 								>
 									{b.content}
