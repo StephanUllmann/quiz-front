@@ -41,9 +41,14 @@ const Blank = ({
 				value={val}
 				pattern={text}
 				spellCheck={false}
-				onClick={handleClick}
 				onBlur={checkExercise}
 				onChange={handleChange}
+				onClick={handleClick}
+				onDragOver={(e) => e.preventDefault()}
+				onDrop={(e) => {
+					e.preventDefault();
+					handleClick();
+				}}
 				style={{
 					minWidth: inCode ? `${text.length + 10.5}ch` : `${text.length + 4}ch`,
 					backgroundColor: inCode ? "#1D1D1D" : undefined,

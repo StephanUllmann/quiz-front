@@ -197,10 +197,12 @@ const Cloze = ({
 						{blanks.map((b, ind) => {
 							return (
 								<button
+									draggable
 									type="button"
 									key={b.content + ind}
 									className="px-3 py-1 badge bg-[#6054e8] rounded-full cursor-pointer select-none hover:ring transition-colors group relative"
 									onClick={() => handleClipboardClick(b.content)}
+									onDragStart={() => handleClipboardClick(b.content)}
 								>
 									{b.content}
 									<span
