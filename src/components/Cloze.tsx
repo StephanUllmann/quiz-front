@@ -125,10 +125,10 @@ const Cloze = ({
 						<Refractor language={lang} value={snippet} />
 						<pre
 							className={
-								"inset-0 absolute opacity-100 refractor language-typescript "
+								"inset-0 absolute opacity-100 refractor language-typescript pointer-events-none"
 							}
 						>
-							<code className="language-typescript">
+							<code className="language-typescript pointer-events-auto">
 								{overlaySnippet.map((s) => {
 									if (s.startsWith("%%keyword:")) {
 										return (
@@ -143,7 +143,7 @@ const Cloze = ({
 										);
 									}
 									return (
-										<span key={s} className="opacity-0">
+										<span key={s} className="opacity-0 pointer-events-none">
 											{s}
 										</span>
 									);
