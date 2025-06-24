@@ -120,7 +120,7 @@ const Cloze = ({
 				return (
 					<div
 						key={snippet}
-						className="relative *:!m-0 my-2 rounded-2xl shadow overflow-clip"
+						className="relative *:!m-0 my-2 rounded-2xl shadow overflow-clip max-w-[80ch]"
 					>
 						<Refractor language={lang} value={snippet} />
 						<pre
@@ -158,7 +158,7 @@ const Cloze = ({
 	);
 
 	return (
-		<div className="max-w-3xl mx-auto p-6 rounded-lg shadow-lg space-y-5">
+		<div className="max-w-4xl mx-auto p-6 rounded-lg shadow-lg space-y-5">
 			<h2 className="text-2xl font-bold ">Fill in the blanks</h2>
 
 			<form ref={containerRef} className="text-lg leading-loose ">
